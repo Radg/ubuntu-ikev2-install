@@ -1,3 +1,5 @@
 #!/bin/bash
 
-SSH_PORT=2077
+SSH_PORT=22 # Need to determine automatically
+IPT_RULES=/etc/iptables.rules
+VPN_NET=10.12.13.0/24

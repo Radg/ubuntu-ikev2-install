@@ -3,8 +3,6 @@
 # Config file
 source config
 
-# echo $SSH_PORT
-
 # Established or related connections accept
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
@@ -21,3 +19,10 @@ iptables -A INPUT -i lo -j ACCEPT
 # Drop other connections
 iptables -P INPUT DROP
 
+# Masquerading for VPN
+iptables -t nat -A POSTROUTING -s $VPN_NET -o eth0 -j MASQUERADE
+
+# Save iptables rules
+iptables-save > $IPT_RULES
+
+apt-get install -y iptables-persistent
