@@ -1,7 +1,6 @@
 #!/bin/bash
 
 DOMAIN_NAME=server.example.com
-SSH_PORT=22922
 ADMIN_EMAIL=admin@example.com
 
 LEFT_ID="leftid="$DOMAIN_NAME
@@ -29,7 +28,6 @@ echo "...done!"
 echo "Setting iptables up..."
 echo "------------------------------------"
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport $SSH_PORT -j ACCEPT
 iptables -A INPUT -p udp -m udp --dport 4500 -j ACCEPT
 iptables -A INPUT -p udp -m udp --dport 500 -j ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
@@ -84,6 +82,11 @@ echo "...done!"
 echo "Restarting ipsec..."
 echo "------------------------------------"
 ipsec restart
+echo "...done!"
+
+echo "Setting up crontab..."
+echo "------------------------------------"
+echo "$(echo "40 1 * * 1 iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT && letsencrypt renew && cp /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem /etc/ipsec.d/certs && cp /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem /etc/ipsec.d/private && ipsec restart && iptables -D INPUT -p tcp --dport 443 -j ACCEPT" ; crontab -l)" | crontab -
 echo "...done!"
 
 echo "Finished!"
